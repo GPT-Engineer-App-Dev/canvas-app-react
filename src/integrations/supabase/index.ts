@@ -7,7 +7,7 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const queryClient = new QueryClient();
-export function SupabaseProvider({ children }) {
+export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return React.createElement(QueryClientProvider, { client: queryClient }, children);
 }
 
@@ -42,7 +42,7 @@ export type Venue = {
 };
 
 // Helper function to handle Supabase queries
-const fromSupabase = async (query) => {
+const fromSupabase = async (query: any) => {
     const { data, error } = await query;
     if (error) throw new Error(error.message);
     return data;
@@ -57,14 +57,14 @@ export const useEvents = () => useQuery({
 export const useAddEvent = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newEvent) => fromSupabase(supabase.from('events').insert([newEvent])),
+        mutationFn: (newEvent: Event) => fromSupabase(supabase.from('events').insert([newEvent])),
         onSuccess: () => {
-            queryClient.invalidateQueries('events');
+            queryClient.invalidateQueries(['events']);
         },
     });
 };
 
-export const useComments = (eventId) => useQuery({
+export const useComments = (eventId: number) => useQuery({
     queryKey: ['comments', eventId],
     queryFn: () => fromSupabase(supabase.from('comments').select('*').eq('event_id', eventId)),
 });
@@ -72,9 +72,9 @@ export const useComments = (eventId) => useQuery({
 export const useAddComment = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newComment) => fromSupabase(supabase.from('comments').insert([newComment])),
+        mutationFn: (newComment: Comment) => fromSupabase(supabase.from('comments').insert([newComment])),
         onSuccess: () => {
-            queryClient.invalidateQueries('comments');
+            queryClient.invalidateQueries(['comments']);
         },
     });
 };
@@ -87,9 +87,9 @@ export const useVenues = () => useQuery({
 export const useAddVenue = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newVenue) => fromSupabase(supabase.from('venues').insert([newVenue])),
+        mutationFn: (newVenue: Venue) => fromSupabase(supabase.from('venues').insert([newVenue])),
         onSuccess: () => {
-            queryClient.invalidateQueries('venues');
+            queryClient.invalidateQueries(['venues']);
         },
     });
 };
